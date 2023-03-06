@@ -185,136 +185,112 @@ export function drawStation(fName,sName, style, type, posX, posY, lineColor) {
     }
 
   };
-export function drawLine(color, thicness, beginX, beginY, endX, endY, style){
+export function drawLine(color, thicness, beginX, beginY, endX, endY, style, line_instance){
     var svgns = "http://www.w3.org/2000/svg";
-    var line = document.createElementNS( svgns, 'line');
-    var line2 = document.createElementNS( svgns, 'line');
-    var line3 = document.createElementNS( svgns, 'line');
+    if(document.getElementById('line_' + line_instance) == null){
+        var path = document.createElementNS(svgns, 'path');
+        path.setAttributeNS(null, 'd', 'M');
+    }
+    else{
+        var path = document.getElementById('line_' + line_instance);
+    }
+    var d = path.getAttributeNS(null, 'd');
+    var x = 0;
+    var y = 0;
+    //math behind the connection a the butt section
+    const r = 25
+    const dirX = endX > beginX;
+    const dirY = endY > beginY;
+    const Rx = dirX ? r : -r; // if directionX == true then r is positive
+    const Ry = dirY ? r : -r;
+    const sqrtX = Rx / Math.sqrt(2);
+    const sqrtY = Ry / Math.sqrt(2);
+    
     if(style == 'a'){
-        line.setAttributeNS( null,'id',line_instances);
-        line.setAttributeNS( null,'class','first');
-        line.setAttributeNS( null,'x1',beginX);
-        line.setAttributeNS( null,'y1',beginY);
-        if(endY == beginY){
-            line.setAttributeNS( null,'y2',endY);
+        d += beginX + ' ' + beginY + ' ';
+        if(endX > beginX){
+            x = endX-25;
+        }else if(endX < beginX){
+            x = endX+25;
+        }else if(endX == beginX){
+            x = endX;
+        }
+        if(endY != beginY){
+            y = beginY;
         }else{
-            line.setAttributeNS( null,'y2',beginY);
+            y = endY;
         }
-        if(beginX == endX){
-            line.setAttributeNS( null,'x2',endX);
-        }else if(beginX > endX){
-            line.setAttributeNS( null,'x2',endX+25);
-        }else if(beginX < endX){
-            line.setAttributeNS( null,'x2',endX-25);
+        d += 'L' + x + ' ' + y + ' ';
+        d += 'M' + x + ' ' + y + ' ';
+        if(endY > beginY){
+            y = beginY+25;
+        }else if(endY < beginY){
+            y = beginY-25;
+        }else if(endY == beginY){
+            y = beginY;
         }
-        line.setAttributeNS( null,'fill', color);
-        line.setAttributeNS( null,'stroke-width', thicness);
-        line.setAttributeNS( null,'stroke', color);
-    
-        line2.setAttributeNS( null,'id',line_instances);
-        line2.setAttributeNS( null,'class','diag');
-        if(beginX == endX){
-            line2.setAttributeNS( null,'x1',endX);
-        }else if(beginX > endX){
-            line2.setAttributeNS( null,'x1',endX+25);
-        }else if(beginX < endX){
-            line2.setAttributeNS( null,'x1',endX-25);
-        }
-        if(endY == beginY){
-            line2.setAttributeNS( null,'y1',endY);
-        }else{
-            line2.setAttributeNS( null,'y1',beginY);
-        }
-        line2.setAttributeNS( null,'x2',endX);
-        if(beginY == endY){
-            line2.setAttributeNS( null,'y2',beginY);
-        }else if(beginY > endY){
-            line2.setAttributeNS( null,'y2',beginY-26.35);
-        }else{
-            line2.setAttributeNS( null,'y2',beginY+26.35);
-        }
-        line2.setAttributeNS( null,'fill', color);
-        line2.setAttributeNS( null,'stroke-width', thicness);
-        line2.setAttributeNS( null,'stroke', color);
-    
-        line3.setAttributeNS( null,'id',line_instances);
-        line3.setAttributeNS( null,'class','second');
-        line3.setAttributeNS( null,'x1',endX);
-        if(beginY == endY){
-            line3.setAttributeNS( null,'y1',beginY);
-        }else if(beginY > endY){
-            line3.setAttributeNS( null,'y1',beginY-26.35);
-        }else{
-            line3.setAttributeNS( null,'y1',beginY+26.35);
-        }
-        line3.setAttributeNS( null,'x2',endX);
-        line3.setAttributeNS( null,'y2',endY);
-        line3.setAttributeNS( null,'fill', color);
-        line3.setAttributeNS( null,'stroke-width', thicness);
-        line3.setAttributeNS( null,'stroke', color);
+        x = endX;
+        d += `c0,${sqrtY},0,${sqrtY},${sqrtX},${2 * sqrtY}` + 'L' + x + ' ' + y + ' ' + `c${sqrtX},${sqrtY},${sqrtX},${Ry},${Rx + sqrtX},${Ry}`;
+        d += 'M' + x + ' ' + y + ' ';
+        y = endY;
+        d += 'L' + x + ' ' + y + ' ';
+        d += 'M' + x + ' ' + y + ' ';
 
+        path.setAttributeNS(null, 'd', d);
+        path.setAttributeNS(null, 'id', 'line_' + line_instance);
+        path.setAttributeNS(null, 'stroke', color);
+        path.setAttributeNS(null, 'stroke-width', thicness);
+        path.setAttributeNS(null, 'fill', color);
+        
         
     }else if(style == 'b'){
-        line.setAttributeNS( null,'id',line_instances);
-        line.setAttributeNS( null,'class','first');
-        line.setAttributeNS( null,'x1',beginX);
-        line.setAttributeNS( null,'y1',beginY);
-        if(endX == beginX){
-            line.setAttributeNS( null,'x2',endX);
+        d += beginX + ' ' + beginY + ' ';
+        if(endY > beginY){
+            y = endY-25;
+        }else if(endY < beginY){
+            y = endY+25;
+        }else if(endY == beginY){
+            y = endY;
+        }
+        if(endX != beginX){
+            x = beginX;
         }else{
-            line.setAttributeNS( null,'x2',beginX);
+            x = endX;
         }
-        if(beginY == endY){
-            line.setAttributeNS( null,'y2',endY);
-        }else if(beginY > endY){
-            line.setAttributeNS( null,'y2',endY+25);
-        }else if(beginY < endY){
-            line.setAttributeNS( null,'y2',endY-25);
+        d += 'L' + x + ' ' + y + ' ';
+        d += 'M' + x + ' ' + y + ' ';
+        if(endX > beginX){
+            x = beginX+25;
+        }else if(endX < beginX){
+            x = beginX-25;
+        }else if(endX == beginX){
+            x = beginX;
         }
-        line.setAttributeNS( null,'fill', color);
-        line.setAttributeNS( null,'stroke-width', thicness);
-        line.setAttributeNS( null,'stroke', color);
-    
-        line2.setAttributeNS( null,'id',line_instances);
-        line2.setAttributeNS( null,'class','diag');
-        line2.setAttributeNS( null,'x1',beginX);
-        if(beginY == endY){
-            line2.setAttributeNS( null,'y1',endY);
-        }else if(beginY > endY){
-            line2.setAttributeNS( null,'y1',endY+26.35);
-        }else{
-            line2.setAttributeNS( null,'y1',endY-26.35);
-        }
-        if(beginX == endX){
-            line2.setAttributeNS( null,'x2',beginX);
-        }else if(beginX > endX){
-            line2.setAttributeNS( null,'x2',beginX-26.35);
-        }else{
-            line2.setAttributeNS( null,'x2',beginX+26.35);
-        }
-        line2.setAttributeNS( null,'y2',endY);
-        line2.setAttributeNS( null,'fill', color);
-        line2.setAttributeNS( null,'stroke-width', thicness);
-        line2.setAttributeNS( null,'stroke', color);
-    
-        line3.setAttributeNS( null,'id',line_instances);
-        line3.setAttributeNS( null,'class','second');
-        if(beginX == endX){
-            line3.setAttributeNS( null,'x1',beginX);
-        }else if(beginX > endX){
-            line3.setAttributeNS( null,'x1',beginX-25);
-        }else{
-            line3.setAttributeNS( null,'x1',beginX+25);
-        }
-        line3.setAttributeNS( null,'y1',endY);
-        line3.setAttributeNS( null,'x2',endX);
-        line3.setAttributeNS( null,'y2',endY);
-        line3.setAttributeNS( null,'fill', color);
-        line3.setAttributeNS( null,'stroke-width', thicness);
-        line3.setAttributeNS( null,'stroke', color);
+        x = endX;
+        d += 'L' + x + ' ' + y + ' ';
+        d += 'M' + x + ' ' + y + ' ';
+        y = endY;
+        d += 'L' + x + ' ' + y + ' ';
+        d += 'M' + x + ' ' + y + ' ';
+
+        path.setAttributeNS(null, 'd', d);
+        path.setAttributeNS(null, 'id', 'line_' + line_instance);
+        path.setAttributeNS(null, 'stroke', color);
+        path.setAttributeNS(null, 'stroke-width', thicness);
+        path.setAttributeNS(null, 'fill', color);
+        
     }
-    document.getElementById( 'canvas' ).appendChild( line );
-    document.getElementById( 'canvas' ).appendChild( line2 );
-    document.getElementById( 'canvas' ).appendChild( line3 );
+    document.getElementById( 'canvas' ).appendChild( path );
     line_instances++;
 };
+
+export function drawStationsList(network){
+    var st_list = document.getElementById('st-list');
+    for(station of network.lines[instancesLine].stations){
+        let stationButton = document.createElement('a');
+        stationButton.innerText = station.fName;
+        stationButton.setAttributeNS(null, 'id', network.lines[instancesLine].stations.indexOf(station));
+        stationButton.setAttributeNS(null, 'class', 'station_instance');
+        st_list.appendChild(stationButton);
+    }
+}
